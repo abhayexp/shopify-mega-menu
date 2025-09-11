@@ -1,0 +1,671 @@
+<!-- Navigation Bar Example -->
+<header>
+  <nav class="main-nav">
+    <div class="header-mobile-btn">
+      <button class="hamburger" id="hamburger">
+        <svg
+          width="25"
+          height="25"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      {% comment %}
+        <button id="close-menu" aria-label="Close Menu">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            width="24"
+            height="24"
+          >
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.2"
+                  d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      {% endcomment %}
+    </div>
+
+    <ul class="nav-list" id="main-menu">
+      <!-- JS will render everything here -->
+    </ul>
+  </nav>
+</header>
+
+<style>
+                .main-nav {
+                  position: relative;
+                }
+
+                {% comment %}  navbar {% endcomment %}
+                .nav-list {
+                  display: flex;
+                  list-style: none;
+                  margin: 0;
+                  padding: 0;
+                  gap: 20px;
+                }
+      {% comment %} .nav-toggle {
+        display:  none  !important; /* hidden by default */
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: 8px;
+      } {% endcomment %}
+
+
+      {% comment %} hamburger {% endcomment %}
+       #hamburger {
+        display:none;
+      }
+
+
+
+      /* Mobile */
+      @media (max-width: 768px) {
+
+        .nav-list
+        {
+           display:none;
+        }
+        {% comment %} hamburger {% endcomment %}
+        #hamburger{
+         display:block;
+        }
+
+        .hamburger {
+            background: white;
+            border: none;
+            padding: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+       }
+
+        .nav-item {
+          padding: 10px 20px;
+          }
+
+         .menu-modal {
+           display:block;
+        }
+        .nav-list.active {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        height: 100vh
+      }
+      body.menu-open{
+        overflow:hidden;
+      }
+
+
+    .has-children.open {
+      display: block;
+    }
+
+      {% comment %} mobile  slider {% endcomment %}
+       .slider-area{
+        margin-top:50px;
+      }
+
+
+      }
+      .nav-item {
+          position: relative;
+       }
+        .menu-link {
+          display: block;
+          padding: 15px 20px;
+          font-size: 1.1rem;
+          color: #222;
+          text-decoration: none;
+          }
+                .menu-link:hover {
+                  color: #33996a;
+                }
+                .menu-modal {
+                  display: none;
+                  position: fixed;
+                  top: 100%;
+                  left: 0;
+                  width:100%;
+                  right:0;
+                  {% comment %} min-width: 700px; {% endcomment %}
+                  background: #fff;
+                  {% comment %} box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); {% endcomment %}
+                  z-index: 20;
+                  padding: 30px;
+                  {% comment %} border-radius: 0 0 10px 10px; {% endcomment %}
+                  gap: 32px;
+                  flex-wrap: nowrap;
+                  flex-direction: row;
+                }
+                .nav-item.has-children:hover > .menu-modal {
+                  display: flex;
+                }
+
+                .menu-col {
+                  {% comment %} flex: 1   1 180px; {% endcomment %}
+                  padding-right: 40px;
+                }
+                .menu-col b {
+                  display: block;
+                  margin-bottom: 12px;
+                  color: #054b31;
+                }
+                .menu-col ul {
+                  list-style: none;
+                  padding: 0;
+                  margin: 0;
+                }
+                .menu-col li a {
+                  color: #777;
+                  text-decoration: none;
+                  transition: color 0.13s;
+                }
+                .menu-col li a:hover {
+                  color: #222;
+                }
+
+                .slider-area {
+                  min-width: 240px;
+                  display: flex;
+                  align-items: flex-start;
+                }
+
+                .custom-slider-wrapper {
+                  max-width: 250px;
+                  position: relative;
+                }
+                .slide {
+                  display: none;
+                  text-align: center;
+                }
+                .slide.active {
+                  display: block;
+                }
+                .slide img {
+                  max-width: 220px;
+                  border-radius: 8px;
+                }
+                .slide-text h3 {
+                  font-size: 1.1rem;
+                  margin: 12px 0 5px;
+                }
+                .slide-text p {
+                  font-size: 0.98rem;
+                  color: #5a5f5d;
+                  margin: 0;
+                }
+                .prev-slide,
+                .next-slide {
+                  position: absolute;
+                  top: 45%;
+                  background: #2225;
+                  color: #fff;
+                  border: none;
+                  font-size: 1.3rem;
+                  padding: 4px 12px;
+                  border-radius: 50%;
+                  cursor: pointer;
+                  z-index: 10;
+                }
+                .prev-slide {
+                  left: -16px;
+                }
+                .next-slide {
+                  right: -16px;
+                }
+                @media (max-width: 900px) {
+                  .menu-modal {
+                    min-width: 0;
+                    flex-direction: column;
+                  }
+                  .slider-area,
+                  .custom-slider-wrapper {
+                    max-width: 100%;
+                  }
+                }
+
+
+                .menu-col ul {
+                list-style: none;
+                margin: 0 0 0 14px; /* Left margin for nesting */
+                padding: 0;
+              }
+              .menu-col li {
+                margin-bottom: 4px;
+              }
+
+              .menu-col li a {
+                color: #1a1a1a;
+                text-decoration: none;
+                font-weight: 400;
+                padding: 4px 8px;
+                border-radius: 3px;
+                display: inline-block;
+                transition: background 0.16s, color 0.16s;
+              }
+              .menu-col li a:hover {
+                background: #f0f3f0;
+                color: #29986e;
+              }
+
+              /* Indent deeper levels for clarity */
+              .menu-col li ul {
+                margin-left: 18px;
+                margin-top: 3px;
+                border-left: 2px solid #d9f4e2;
+                padding-left: 10px;
+              }
+              .menu-col b {
+                display: block;
+                margin-bottom: 7px;
+                font-size: 1.07rem;
+                color: #179263;
+                font-weight: bold;
+              }
+
+              .has-submenu > .submenu-dropdown {
+              display: none;
+              {% comment %} position: absolute; {% endcomment %}
+              top: 0;
+              {% comment %} left: 100%; /* Flyout to right */ {% endcomment %}
+              min-width: 200px;
+              background: #fff;
+              {% comment %} box-shadow: 0 4px 12px rgba(0,0,0,0.1); {% endcomment %}
+              z-index: 100;
+            }
+
+            .has-submenu:hover > .submenu-dropdown {
+              display: block;
+            }
+
+            .custom-slider-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .custom-slider {
+            position: relative;
+          }
+
+          .slide {
+            display: none;   /* hide all slides */
+            text-align: center;
+          }
+
+          .slide.active {
+            display: block;  /* show only active one */
+          }
+
+          .slide img {
+            max-width: 100%;
+            border-radius: 8px;
+          }
+
+          .custom-slider-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .custom-slider {
+            position: relative;
+          }
+
+          .slide {
+            display: none;   /* hide all slides */
+            text-align: center;
+          }
+
+          .slide.active {
+            display: block;  /* show only active one */
+          }
+
+          .slide img {
+            max-width: 100%;
+            border-radius: 8px;
+          }
+
+          .prev-slide,
+          .next-slide {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 50%;
+          }
+          .prev-slide { left: 10px; }
+          .next-slide { right: 10px; }
+
+
+
+  .custom-slider img {
+    width: 100%;
+    border-radius: 10px;
+  }
+
+  .slide-description {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+  }
+
+
+  {% comment %}
+  .nav-item {
+    position: relative; /* anchor point */
+  }
+
+  .menu-modal {
+    position: absolute;
+    left: 0 !important;
+    top: 100%;
+    width: 100vw;
+    background: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    display: none;
+    z-index: 9999;
+  }
+
+  /* Show on hover (basic dropdown behavior) */
+  .nav-item:hover .menu-modal {
+    display: block;
+  } {% endcomment %}
+</style>
+
+<script>
+
+   async function fetchActiveMenu(){
+     console.log('Fetching active menu...');
+      const url = 'http://localhost:5000/api/menu/active';
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log('Active menu data:', data);
+        const activeMenu = data.menu.data.items;
+        console.log(' Active menu items:', activeMenu)
+        ;
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+    // 1. Render menu
+  const navList = document.getElementById('main-menu');
+  activeMenu.forEach(menu => {
+    const li = document.createElement('li');
+    li.className = "nav-item";
+    const link = document.createElement('a');
+    link.textContent = menu.label;
+    {% comment %} link.href = "https://onlineksrtcswift.com/"; {% endcomment %}
+    link.href = `/collections/${menu.linkType}`; 
+    link.className = "menu-link";
+    li.appendChild(link);
+
+    if (Array.isArray(menu.children) && menu.children.length > 0) {
+      li.classList.add("has-children");
+      
+      {% comment %} toggle btn for mobile screen {% endcomment %}
+      {% comment %} const toggleBtn = document.createElement("button");
+      toggleBtn.className ="nav-toggle";
+      toggleBtn.innerHTML = "&#9662;"; // ▼ arrow
+      li.appendChild(toggleBtn); {% endcomment %}
+
+
+      const modal = document.createElement('div');
+      modal.className = "menu-modal";
+      menu.children.forEach(childNode => {
+        modal.appendChild(renderMenuColumn(childNode));
+      });
+      if (menu.images && Array.isArray(menu.images) && menu.isSliderVisible === true && menu.images.length > 1) {
+        console.log("Slider will be rendered");
+        console.log("image found", menu.images);
+        {% comment %} slider area {% endcomment %}
+        const sliderArea = document.createElement('div');
+        sliderArea.className = "slider-area";
+
+         // Build HTML
+  sliderArea.innerHTML = `
+    <div class="custom-slider-wrapper">
+      <div class="custom-slider">
+        ${menu.images
+          .map(
+            (slide, idx) => `
+          <div class="slide${idx === 0 ? " active" : ""}">
+            <img src="${slide.url}" alt="Slide ${idx + 1}">
+            <div class="slide-text">
+              <h3>${slide.title || ""}</h3>
+              <div class="slide-description">
+                ${slide.description || ""}
+              </div>
+            </div>
+          </div>
+        `
+          )
+          .join("")}
+        <button class="prev-slide">&#10094;</button>
+        <button class="next-slide">&#10095;</button>
+      </div>
+    </div>
+  `;
+
+        modal.appendChild(sliderArea);
+
+
+        {% comment %} slider logic {% endcomment %}
+
+        const slides = sliderArea.querySelectorAll(".slide");
+        const prevBtn = sliderArea.querySelector(".prev-slide");
+        const nextBtn = sliderArea.querySelector(".next-slide");
+        let current =0;
+
+        function showSlide(index){
+          slides.forEach((s, i)=>{
+            s.classList.toggle("active", i ==index);
+          });
+          current = index;
+        }
+         prevBtn.addEventListener("click",()=>{
+           let newIndex = (current - 1 + slides.length) % slides.length;
+           showSlide(newIndex);
+          });
+
+         nextBtn.addEventListener("click", ()=>{
+         let newIndex = (current + 1) % slides.length;
+        showSlide(newIndex);
+         });
+      }
+        li.appendChild(modal);
+      }
+      navList.appendChild(li);
+    });
+    
+  });
+
+const navList = document.getElementById("main-menu");
+
+const navlist = document.querySelector(".nav-list");
+
+  {% comment %} hamburger {% endcomment %}
+const hamburger = document.getElementById("hamburger");
+hamburger.addEventListener("click", () => {
+  console.log("ham clicked");
+  navlist.classList.toggle("active");
+  document.body.classList.toggle("menu-open");
+});
+
+{% comment %} cross {% endcomment %}
+{% comment %} const closeMenu = document.getElementById("close-menu");
+closeMenu.addEventListener("click",()=>{
+console.log("close clicked");
+navList.classList.remove("active");
+document.body.classList.remove("menu-open");
+}); {% endcomment %}
+
+
+
+
+
+// handle child node
+document.querySelectorAll('has-children').forEach(link=>{
+  link.addEventListener("click", (e)=>{
+  if (window.innerWidth <= 768) { 
+      e.preventDefault(); 
+      link.parentElement.classList.toggle("open"); // toggle submenu
+    }
+  })
+})
+
+
+ 
+  function renderMenuColumn(node, depth=0) {
+    const colDiv = document.createElement('div');
+    colDiv.className = "menu-col";
+
+    // Title
+    const link = document.createElement('a');
+    link.textContent = node.label;
+    link.href = `/collections/${node.linkType}`; 
+    colDiv.appendChild(link);
+
+    // Render links if present (Array of strings)
+    if (Array.isArray(node.links) && node.links.length > 0) {
+      const ul = document.createElement('ul');
+      node.links.forEach(label => {
+        const litem = document.createElement('li');
+        const a = document.createElement('a');
+        a.textContent = label;
+        a.href = "#";
+        litem.appendChild(a);
+        ul.appendChild(litem);
+      });
+      colDiv.appendChild(ul);
+    }
+
+    // If there are children, render below, indented
+   if (Array.isArray(node.children) && node.children.length > 0) {
+    // Create the list container for this node
+    const ul = document.createElement('ul');
+
+    node.children.forEach(childNode => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.textContent = childNode.label;
+      a.href = "https://trainchart.in/";
+      li.appendChild(a);
+
+      if (Array.isArray(childNode.children) && childNode.children.length > 0) {
+        li.classList.add('has-submenu');
+
+        // Create flyout container
+        const flyout = document.createElement('div');
+        flyout.className = 'submenu-dropdown';
+        flyout.appendChild(renderMenuColumn(childNode, depth + 1));
+
+        li.appendChild(flyout);
+      }
+
+      ul.appendChild(li);
+    });
+
+    colDiv.appendChild(ul);
+  }
+    return colDiv;
+  }
+      }
+      catch(error)
+      {
+        console.log(error)
+      }
+  }
+
+
+  fetchActiveMenu();
+</script>
+
+{% schema %}
+{
+  "name": "Header2",
+  "target": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "heading_1",
+      "label": "heading",
+      "default": "use Freedom 55 to get 20 % "
+    },
+    {
+      "type": "text",
+      "id": "subheading_1",
+      "label": "subheading",
+      "default": "freedom coupon"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "heading_2",
+      "label": "heading",
+      "default": "use Freedom 55 to get 20 % "
+    },
+    {
+      "type": "text",
+      "id": "subheading_2",
+      "label": "subheading",
+      "default": "freedom coupon"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "heading_3",
+      "label": "heading",
+      "default": "use Freedom 55 to g  et 20 % "
+    },
+    {
+      "type": "text",
+      "id": "subheading_3",
+      "label": "subheading",
+      "default": "freedom coupon"
+    }
+  ]
+}
+{% endschema %}
