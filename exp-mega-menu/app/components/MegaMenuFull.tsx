@@ -39,7 +39,7 @@ interface MegaMenu {
 export default function MegaMenuFullScreenLayout() {
 
   const [active, setActive] = useState(false);
-  const [tree, setTree] = useState<MegaMenu[]>([]);
+  const [tree, setTree] = useState<TreeNode[]>([]);
   const [menu, setMenu] = useState<MegaMenu>({
     id: `menu-${uuidv4()}`,
     title: '',
@@ -60,7 +60,11 @@ export default function MegaMenuFullScreenLayout() {
 
 
 
-  const toggleActive = () => setActive(prev => !prev);
+  const toggleActive = () =>{
+    setTree([]);
+   setActive(prev => !prev);
+  }
+    
 
   useEffect(() => {
     document.body.style.overflow = active ? 'hidden' : 'auto';
@@ -69,13 +73,12 @@ export default function MegaMenuFullScreenLayout() {
 
   //  Add  MegaMenu 
   const handleMenuSubmit = async () => {
-
     const finalMenu = {
       ...menu,
       items: tree,
     };
 
-
+    console.log("final menu ",finalMenu);
 
     // call menu upload api
     fetch("http://localhost:5000/api/add-menu", {
@@ -113,7 +116,11 @@ export default function MegaMenuFullScreenLayout() {
       id: `menu-${uuidv4()}`,
       items: obj.items
     }));
+    setTree(obj.items); 
+
   }
+
+  console.log("customise data", customize);
 
   return (
     <Frame>
