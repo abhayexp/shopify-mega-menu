@@ -67,7 +67,7 @@ export const AddMenu = async (req, res) => {
 
 export const getAllMenu = async (req, res) => {
   try {
-    const menus = await Menu.find().lean(); // lean() makes it faster, returns plain JS objects
+    const menus = await Menu.find().lean(); 
 
     if (!menus || menus.length === 0) {
       return res.status(404).json({ message: "No menus found" });
@@ -120,13 +120,13 @@ export const deleteMenu = async (req, res) => {
       return res.status(400).json({ message: "Menu ID is required" });
     }
 
-    const menu = await MegaMenu.findOne({ menuId: menuId });
+    const menu = await MegaMenu.findOne({ id: menuId });
 
     if (!menu) {
       return res.status(404).json({ message: "Menu not found" });
     }
 
-    await MegaMenu.findOneAndDelete({ menuId: menuId });
+    await MegaMenu.findOneAndDelete({ id: menuId });
     res.status(200).json({ message: "Menu deleted successfully" });
   } catch (error) {
     console.error("Delete menu error:", error);

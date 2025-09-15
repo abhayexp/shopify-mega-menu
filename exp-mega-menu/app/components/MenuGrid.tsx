@@ -127,7 +127,6 @@ export default function MenuGrid({ onCustomise }: any) {
 
   const handleDelete = async (id: string) => {
     try {
-      console.log(" Menu deleted", id);
       const response = await fetch("http://localhost:5000/api/deletemenu", {
         method: 'DELETE',
         headers: {
@@ -136,6 +135,7 @@ export default function MenuGrid({ onCustomise }: any) {
         body: JSON.stringify({ menuId: id })
       })
       const data = await response.json();
+      console.log(" data", data);
       if (!response.ok) {
         console.log(" Delete Failed", id);
         return;
@@ -144,7 +144,6 @@ export default function MenuGrid({ onCustomise }: any) {
         console.log("Menu deleted:", data.message);
         fetchMenus();
       }
-
     }
     catch (error) {
       console.log(error);
