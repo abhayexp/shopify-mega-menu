@@ -1,11 +1,11 @@
 import { model } from "mongoose";
-import MegaMenu from '../models/megamenu.js';
+import MegaMenu from "../models/megamenu.js";
 
 import sliderSchema from "../models/sliderSchema.js";
 import PublishMenu from "../models/publish.js";
 import CategorySlider from "../models/sliderSchema.js";
 import MenuSliders from "../models/sliderSchema.js";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import Menu from "../models/megamenu.js";
 
@@ -14,7 +14,6 @@ import mongoose from "mongoose";
 import UploadedImage from "../models/images.js";
 import dotenv from "dotenv";
 dotenv.config();
-
 
 let gfs;
 
@@ -27,18 +26,16 @@ mongoose.connection.once("open", () => {
 //  Add Menu
 export const AddMenu = async (req, res) => {
   try {
-
     const data = req.body;
     console.log(data);
 
-    let menu = await Menu.findOne({id: data.id });  
+    let menu = await Menu.findOne({ id: data.id });
 
-    if (menu) { 
-      menu = await Menu.findOneAndUpdate(
-        { id: data.id },
-        data,
-        { new: true, runValidators: true }
-      );
+    if (menu) {
+      menu = await Menu.findOneAndUpdate({ id: data.id }, data, {
+        new: true,
+        runValidators: true,
+      });
 
       return res.status(200).json({
         message: "Mega menu updated successfully",
@@ -59,15 +56,11 @@ export const AddMenu = async (req, res) => {
   }
 };
 
-
-
-
-
-// get All Menu 
+// get All Menu
 
 export const getAllMenu = async (req, res) => {
   try {
-    const menus = await Menu.find().lean(); 
+    const menus = await Menu.find().lean();
 
     if (!menus || menus.length === 0) {
       return res.status(404).json({ message: "No menus found" });
@@ -84,37 +77,31 @@ export const getAllMenu = async (req, res) => {
   }
 };
 
-
 //Get Menu ByID
 export const getMenuById = async (req, res) => {
-
   try {
     const { menuId } = req.body;
 
     if (!menuId) {
-      res.status(400).json({ message: "Menu Id Not  Found" });
-
+      res.status(400).json({ message: "Menu Id  Not  Found" });
     }
     const menuItem = await MegaMenu.findById({ menuId });
 
     if (!menuItem) {
       res.status(400).json({ message: " Menu Item  Not found" });
     }
-    res.status(200).json({ message: 'Menu Fetched', menuItem });
-
+    res.status(200).json({ message: "Menu Fetched", menuItem });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
-
   }
-}
+};
 
 // Delete menu
 export const deleteMenu = async (req, res) => {
   try {
     const { menuId } = req.body;
-    console.log('Searching for menuId:', menuId);
-
+    console.log("Searching for menuId:", menuId);
 
     if (!menuId) {
       return res.status(400).json({ message: "Menu ID is required" });
@@ -134,8 +121,6 @@ export const deleteMenu = async (req, res) => {
   }
 };
 
-
-
 // get collection
 export const getCollection = async (req, res) => {
   try {
@@ -146,14 +131,16 @@ export const getCollection = async (req, res) => {
     const shop = process.env.SHOP_URL;
     const version = process.env.API_VERSION;
 
-    const response = await fetch(`https://${shop}/admin/api/${version}/graphql.json`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': TOKEN,
-      },
-      body: JSON.stringify({
-        query: `
+    const response = await fetch(
+      `https://${shop}/admin/api/${version}/graphql.json`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Shopify-Access-Token": TOKEN,
+        },
+        body: JSON.stringify({
+          query: `
           query GetCollections {
             collections(first: 10) {
               edges {
@@ -165,33 +152,36 @@ export const getCollection = async (req, res) => {
               }
             }
           }
-        `
-      }),
-    });
+        `,
+        }),
+      }
+    );
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Response(`Shopify API Error: ${error}`, { status: response.status });
+      throw new Response(`Shopify API Error: ${error}`, {
+        status: response.status,
+      });
     }
 
     const result = await response.json();
     console.log(result);
     const collections = result.data.collections.edges.map((edge) => edge.node);
     console.log(collections);
-    return res.status(200).json({ message: " Collection Fetched Successfully" , collections})
-
-
+    return res
+      .status(200)
+      .json({ message: " Collection Fetched Successfully", collections });
   } catch (error) {
     console.error("Loader Error:", error);
     throw new Response("Internal Server Error", { status: 500 });
   }
 };
 
-// publish menu 
+// publish menu
 export const publishMenu = async (req, res) => {
   try {
     const { menuId } = req.params;
-    console.log( "Menu Id ",menuId);
+    console.log("Menu Id ", menuId);
 
     if (!menuId) {
       return res.status(400).json({ error: "Menu ID not provided." });
@@ -199,7 +189,9 @@ export const publishMenu = async (req, res) => {
 
     const menu = await Menu.findOne({ id: menuId });
     if (!menu) {
-      return res.status(404).json({ error: "Menu not found with the given ID." });
+      return res
+        .status(404)
+        .json({ error: "Menu not found with the given ID." });
     }
 
     // Always have a unique non-null publishId
@@ -240,10 +232,11 @@ export const publishMenu = async (req, res) => {
       message: "Menu re-activated successfully",
       data: isPublished,
     });
-
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: error.message || "Internal server error" });
+    return res
+      .status(500)
+      .json({ error: error.message || "Internal server error" });
   }
 };
 
@@ -265,7 +258,6 @@ export const publishMenu = async (req, res) => {
 //     const pId = menuId;
 
 //     // save new created menu
-
 
 //     //check is already published
 //     const isPublished = await PublishMenu.findOne({ publishId: pId });
@@ -308,16 +300,14 @@ export const publishMenu = async (req, res) => {
 //   }
 // };
 
-
 export const getPublishMenu = async (req, res) => {
-
   try {
     const menu = await PublishMenu.findOne({
-      status: 'active'
+      status: "active",
     });
 
     if (!menu) {
-      return res.status(400).json({ message: " Menu Not  Found" })
+      return res.status(400).json({ message: " Menu Not  Found" });
     }
 
     // const baseUrl = `${req.protocol}://${req.get("host")}/api/file/`;
@@ -338,22 +328,20 @@ export const getPublishMenu = async (req, res) => {
     //   }
     // };
 
-    return res.status(200).json({ message: " Menu founded", menu })
-
+    return res.status(200).json({ message: " Menu founded", menu });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
-}
-
+};
 
 export const addSliderImage = async (req, res) => {
   try {
     const { categoryName, menuId, slides } = req.body;
     if (!menuId) {
-      res.status(400), json({ message: "Menu Id Not Found" })
+      res.status(400), json({ message: "Menu Id Not Found" });
     }
     const menu = await MegaMenu.findOne({
-      menuId
+      menuId,
     });
     console.log(menu);
     if (!menu) {
@@ -363,14 +351,14 @@ export const addSliderImage = async (req, res) => {
       menuId,
       categoryName,
       slides,
-    })
-    res.status(200).json({ success: true, message: "menu Slides Added SuccesFully" });
+    });
+    res
+      .status(200)
+      .json({ success: true, message: "menu Slides Added SuccesFully" });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
-}
-
-
+};
 
 export const getSliderImage = async (req, res) => {
   try {
@@ -397,11 +385,8 @@ export const getSliderImage = async (req, res) => {
   }
 };
 
-
-
 export const hideSlider = async (req, res) => {
   try {
-    
     const { menuId, itemId, isSliderVisible } = req.body; // accept visibility status
     console.log(req.body);
 
@@ -409,8 +394,8 @@ export const hideSlider = async (req, res) => {
       return res.status(400).json({ message: "Id Not Found" });
     }
 
-    const menu = await Menu.findOne({ 
-      id:menuId
+    const menu = await Menu.findOne({
+      id: menuId,
     });
 
     if (!menu) {
@@ -418,7 +403,7 @@ export const hideSlider = async (req, res) => {
     }
 
     // recursive function to find and update item
-    const updateVisibility = ( items) => {
+    const updateVisibility = (items) => {
       for (let item of items) {
         if (item.id === itemId) {
           item.isSliderVisible = isSliderVisible; // update value
@@ -450,3 +435,62 @@ export const hideSlider = async (req, res) => {
   }
 };
 
+export const subscription = async (req, res) => {
+  try {
+    const shop = process.env.SHOP_URL;
+    const version = process.env.API_VERSION;
+    const TOKEN = process.env.ADMIN_TOKEN;
+
+    // if (!subscriptionId) {
+    //   return res.status(400).json({ message: "Subscription ID is required" });
+    // }
+    // Process the subscription ID as needed
+    // console.log("Received Subscription ID:", subscriptionId.id);
+    const query = `
+    query  {
+      currentAppInstallation {
+    activeSubscriptions {
+      id
+      name
+      status
+      test
+      currentPeriodEnd
+    }
+  }
+    }
+  `;
+
+    const response = await fetch(
+      `https://${shop}/admin/api/${version}/graphql.json`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Shopify-Access-Token": TOKEN,
+        },
+        body: JSON.stringify({ query }),
+      }
+    );
+
+    console.log("GraphQL Response:", response);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("GraphQL Error:", errorData);
+      return res.status(400).json({ message: "Failed to retrieve subscription data", error: errorData });
+    }
+    const result = await response.json();
+    // console.log("GraphQL Result:", result);
+
+    return res
+      .status(200)
+      .json({ message: "Subscription ID received", result });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
