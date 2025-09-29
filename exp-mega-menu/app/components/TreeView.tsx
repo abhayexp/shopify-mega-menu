@@ -25,12 +25,19 @@ const defaultLinkTypeOptions: SelectOption[] = [
   { label: "Page", value: "page" },
 ];
 
-const TreeView: React.FC<TreeEditorProps> = ({ tree, setTree, isCostomize, data }) => {
+const TreeView: React.FC<TreeEditorProps> = ({
+  tree,
+  setTree,
+  isCostomize,
+  data,
+}) => {
   const [label, setLabel] = useState("");
   const [linkType, setLinkType] = useState("custom");
   const [parentId, setParentId] = useState<string | null>(null);
   const [editingNode, setEditingNode] = useState<TreeNode | null>(null);
-  const [linkTypeOptions, setLinkTypeOptions] = useState<SelectOption[]>(defaultLinkTypeOptions);
+  const [linkTypeOptions, setLinkTypeOptions] = useState<SelectOption[]>(
+    defaultLinkTypeOptions,
+  );
 
   // Add Node
   const handleAddNode = () => {
@@ -44,10 +51,10 @@ const TreeView: React.FC<TreeEditorProps> = ({ tree, setTree, isCostomize, data 
 
     const addNode = (nodes: TreeNode[], parentId?: string): TreeNode[] => {
       if (!parentId) return [...nodes, newNode];
-      return nodes.map(node =>
+      return nodes.map((node) =>
         node.id === parentId
           ? { ...node, children: [...node.children, newNode] }
-          : { ...node, children: addNode(node.children, parentId) }
+          : { ...node, children: addNode(node.children, parentId) },
       );
     };
 
@@ -56,7 +63,7 @@ const TreeView: React.FC<TreeEditorProps> = ({ tree, setTree, isCostomize, data 
       setTree(updatedItems);
       data.items = updatedItems;
     } else {
-      setTree(prev => addNode(prev, parentId || undefined));
+      setTree((prev) => addNode(prev, parentId || undefined));
     }
 
     setLabel("");
@@ -65,50 +72,83 @@ const TreeView: React.FC<TreeEditorProps> = ({ tree, setTree, isCostomize, data 
   };
 
   // Update Node
-  const updateTreeNode = (nodes: TreeNode[], updatedNode: TreeNode): TreeNode[] =>
-    nodes.map(node =>
-      node.id === updatedNode.id
-        ? { ...node, ...updatedNode }
-        : { ...node, children: updateTreeNode(node.children, updatedNode) }
-    );
+  function updateTreeNode(
+    nodes: TreeNode[],
+    updatedNode: TreeNode,
+  ): TreeNode[] {
+    console.log(" update tree node clicked for node", nodes);
+    setEditingNode(nodes);
+  }
+  console.log(" Editing Node ", editingNode);
+
+  const updateNode = (updatedNode: any) => {
+    console.log("updating  nodes ",updatedNode);
+     const updateTree = (nodes: any[]): any[] => {
+    return nodes.map((node) => {
+      if (node.id === updatedNode.id) {
+        // replace the node with updated values
+        return { ...node, ...updatedNode };
+      }
+
+      if (node.children && node.children.length > 0) {
+        // recurse into children
+        return { ...node, children: updateTree(node.children) };
+      }
+
+      return node;
+    });
+  };
+  setTree((prevTree) => updateTree(prevTree));
+    
+  };
 
   // Delete Node
-    const deleteFromTree = (nodes: TreeNode[], nodeId: string): TreeNode[] =>{
-      console.log(" nodes", nodes);
-      console.log("Node ID ", nodeId);
+  const deleteFromTree = (nodes: TreeNode[], nodeId: string): TreeNode[] => {
+    console.log(" nodes", nodes);
+    console.log("Node ID ", nodeId);
     const newNodes = nodes
-        .filter(node => node.id !== nodeId)
-        .map(node => ({ ...node, children: deleteFromTree(node.children, nodeId) }));
-      console.log(" finale node ", newNodes);
-      return  newNodes
-    }
-    
-const handleDeleteNode = (nodeId: string) => {
-  setTree(prevTree => {
-    const newTree = deleteFromTree(prevTree, nodeId);
-    return newTree;
-  });
+      .filter((node) => node.id !== nodeId)
+      .map((node) => ({
+        ...node,
+        children: deleteFromTree(node.children, nodeId),
+      }));
+    console.log(" finale node ", newNodes);
+    return newNodes;
+  };
 
-  if (editingNode?.id === nodeId) setEditingNode(null);
-};
+  const handleDeleteNode = (nodeId: string) => {
+    setTree((prevTree) => {
+      const newTree = deleteFromTree(prevTree, nodeId);
+      return newTree;
+    });
 
- 
-
-
-
-
+    if (editingNode?.id === nodeId) setEditingNode(null);
+  };
 
   // Render Tree recursively
   const renderTree = (nodes: TreeNode[]) =>
-    nodes.map(node => (
-      <div key={node.id} style={{ marginLeft: 20, marginTop: 10, borderLeft: "1px dashed #ccc", paddingLeft: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    nodes.map((node) => (
+      <div
+        key={node.id}
+        style={{
+          marginLeft: 20,
+          marginTop: 10,
+          borderLeft: "1px dashed #ccc",
+          paddingLeft: 10,
+        }}
+      >
+        <div>
           <div>
             <strong>{node.label}</strong> – <em>{node.linkType}</em>
           </div>
           <div style={{ display: "flex", gap: 6 }}>
-            <Button icon={<Icon source={PlusMinor} />} onClick={() => setParentId(node.id)} />
-            <Button size="slim" onClick={() => setEditingNode(node)}>Edit</Button>
+            <Button
+              icon={<Icon source={PlusMinor} />}
+              onClick={() => setParentId(node.id)}
+            />
+            <Button size="slim" onClick={() => updateTreeNode(node)}>
+              Edit
+            </Button>
             <Button
               size="slim"
               tone="critical"
@@ -117,17 +157,64 @@ const handleDeleteNode = (nodeId: string) => {
               Delete
             </Button>
           </div>
+          {editingNode?.id == node?.id && (
+            <div> 
+              <div
+                style={{
+                  marginTop: 8,
+                  padding: 8,
+                  display: "flex",
+                  alignItems: "flex-end",
+                  gap: 12,
+                }}
+              >
+                <TextField
+                  label=" Category Name"
+                  value={editingNode.label}
+                  onChange={(val) =>
+                    setEditingNode({ ...editingNode, label: val })
+                  }
+                  autoComplete="off"
+                />
+                <Select
+                  label="Link "
+                  options={linkTypeOptions}
+                  value={editingNode.linkType}
+                  onChange={(val)=>{
+                    setEditingNode({...editingNode,linkType: val })
+                  }}
+                />
+                <Button
+                  onClick={() => {
+                    updateNode(editingNode); // pass the full edited node
+                    setEditingNode(null);
+                  }}
+                >
+                  Update
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Child Add Form */}
         {parentId === node.id && (
           <div style={{ marginTop: 8, padding: 8, display: "flex", gap: 12 }}>
-            <TextField label="Child Name" value={label} onChange={setLabel} autoComplete="off" />
-            <Select label="Link Type" options={linkTypeOptions} value={linkType} onChange={setLinkType} />
+            <TextField
+              label="Child Name"
+              value={label}
+              onChange={setLabel}
+              autoComplete="off"
+            />
+            <Select
+              label="Link Type"
+              options={linkTypeOptions}
+              value={linkType}
+              onChange={setLinkType}
+            />
             <Button onClick={handleAddNode}>Add</Button>
           </div>
         )}
-
         {node.children.length > 0 && renderTree(node.children)}
       </div>
     ));
@@ -139,7 +226,10 @@ const handleDeleteNode = (nodeId: string) => {
         const res = await fetch("http://localhost:5000/api/collection");
         if (!res.ok) throw new Error(`Status: ${res.status}`);
         const result = await res.json();
-        const options: SelectOption[] = result.collections.map((c: any) => ({ label: c.title, value: c.handle }));
+        const options: SelectOption[] = result.collections.map((c: any) => ({
+          label: c.title,
+          value: c.handle,
+        }));
         setLinkTypeOptions([...defaultLinkTypeOptions, ...options]);
       } catch (err) {
         console.log(err);
@@ -150,24 +240,34 @@ const handleDeleteNode = (nodeId: string) => {
 
   return (
     <div style={{ marginTop: 20 }}>
-      <div style={{ maxHeight: 500, overflowY: "auto", border: "1px solid #ccc", padding: 10, borderRadius: 6 }}>
-        {isCostomize && data ?  renderTree(tree) :renderTree(data.items)  }
+      <div
+        style={{
+          maxHeight: 500,
+          overflowY: "auto",
+          border: "1px solid #ccc",
+          padding: 10,
+          borderRadius: 6,
+        }}
+      >
+        {isCostomize && data ? renderTree(tree) : renderTree(data.items)}
       </div>
 
       {/* Edit Modal */}
-      {editingNode && (
-        <Modal
+      {/* {editingNode && (
+        <Modal  
           open={true}
           onClose={() => setEditingNode(null)}
           title="Edit Category"
           primaryAction={{
             content: "Save",
             onAction: () => {
-              setTree(prev => updateTreeNode(prev, editingNode));
-              setEditingNode(null);
+              setTree((prev) => updateTreeNode(prev, editingNode));
+              // setEditingNode(null);
             },
           }}
-          secondaryActions={[{ content: "Cancel", onAction: () => setEditingNode(null) }]}
+          secondaryActions={[
+            { content: "Cancel", onAction: () => setEditingNode(null) },
+          ]}
         >
           <Modal.Section>
             <TextField
@@ -179,11 +279,13 @@ const handleDeleteNode = (nodeId: string) => {
               label="Link Type"
               options={linkTypeOptions}
               value={editingNode.linkType}
-              onChange={(val) => setEditingNode({ ...editingNode, linkType: val })}
+              onChange={(val) =>
+                setEditingNode({ ...editingNode, linkType: val })
+              }
             />
           </Modal.Section>
         </Modal>
-      )}
+      )} */}
     </div>
   );
 };

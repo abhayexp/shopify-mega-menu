@@ -75,7 +75,8 @@ const TreeEditor: React.FC<TreeEditorProps> = ({ tree, setTree, isCostomize, dat
     console.log("New Node Created", newNode);
 
     if (isCostomize && data) {
-    
+
+      
       if (!parentId) {
         const updatedItems = [...data.items, newNode];
         setTree(updatedItems);
@@ -120,17 +121,19 @@ const TreeEditor: React.FC<TreeEditorProps> = ({ tree, setTree, isCostomize, dat
 
 
   // Edit Node in Tree
-  const updateTreeNode = (nodes: any) =>
-    nodes.map(node => {
-      if (node.id === editingNode?.id) {
-        return {
-          ...node,
-          label: editingNode.label,
-          linkType: editingNode.linkType,
-        };
-      }
-      return { ...node, children: updateTreeNode(node.children) };
-    });
+  const updateTreeNode = (nodes: any) =>{
+    console.log("dedddd");
+  }
+    // nodes.map(node => {
+    //   if (node.id === editingNode?.id) {
+    //     return {
+    //       ...node,
+    //       label: editingNode.label,
+    //       linkType: editingNode.linkType,
+    //     };
+    //   }
+    //   return { ...node, children: updateTreeNode(node.children) };
+    // });
 
 
 
