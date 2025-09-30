@@ -35,7 +35,7 @@ export async function authenticateAdmin(request: Request) {
   if (!sessionId) throw new Error('No session ID found');
 
   const session = await shopify.config.sessionStorage.loadSession(sessionId);
-
+  
   if (!session) throw new Error('Session not found for session ID');
 
   const admin = new shopify.clients.Graphql({ session });

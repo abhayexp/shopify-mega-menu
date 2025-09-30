@@ -3,7 +3,8 @@ import MegaMenu from '../models/megamenu.js';
 import { AddMenu, deleteMenu, getAllMenu, getCollection,
    getMenuById  , publishMenu, getPublishMenu, addSliderImage,
    getSliderImage,
-   hideSlider
+   hideSlider,
+    subscription
   } from '../controller/MenuController.js';
 import multer from 'multer';
 
@@ -54,7 +55,7 @@ router.get('/menu/active',getPublishMenu);
 
 router.post('/add-slider-images', addSliderImage);
 router.post('/hideslider', hideSlider);
-
+router.get('/issubscribed', subscription);
 
 router.get('/file/:filename', getSliderImage);
 
