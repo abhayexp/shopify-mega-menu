@@ -39,6 +39,18 @@ const TreeView: React.FC<TreeEditorProps> = ({
     defaultLinkTypeOptions,
   );
 
+
+  useEffect(() => {
+    if (isCostomize && data?.items) {
+      setTree(data.items);
+    }
+    else {
+      setTree([]);
+    }
+  }, [isCostomize, data]);
+
+
+  
   // Add Node
   const handleAddNode = () => {
     if (!label.trim()) return;
@@ -51,10 +63,10 @@ const TreeView: React.FC<TreeEditorProps> = ({
 
     const addNode = (nodes: TreeNode[], parentId?: string): TreeNode[] => {
       if (!parentId) return [...nodes, newNode];
-      return nodes.map((node) =>
+      return nodes.map(node =>
         node.id === parentId
           ? { ...node, children: [...node.children, newNode] }
-          : { ...node, children: addNode(node.children, parentId) },
+          : { ...node, children: addNode(node.children, parentId) }
       );
     };
 
@@ -63,7 +75,7 @@ const TreeView: React.FC<TreeEditorProps> = ({
       setTree(updatedItems);
       data.items = updatedItems;
     } else {
-      setTree((prev) => addNode(prev, parentId || undefined));
+      setTree(prev => addNode(prev, parentId || undefined));
     }
 
     setLabel("");
@@ -72,35 +84,15 @@ const TreeView: React.FC<TreeEditorProps> = ({
   };
 
   // Update Node
-  function updateTreeNode(
+  const updateTreeNode = (
     nodes: TreeNode[],
     updatedNode: TreeNode,
-  ): TreeNode[] {
-    console.log(" update tree node clicked for node", nodes);
-    setEditingNode(nodes);
-  }
-  console.log(" Editing Node ", editingNode);
-
-  const updateNode = (updatedNode: any) => {
-    console.log("updating  nodes ",updatedNode);
-     const updateTree = (nodes: any[]): any[] => {
-    return nodes.map((node) => {
-      if (node.id === updatedNode.id) {
-        // replace the node with updated values
-        return { ...node, ...updatedNode };
-      }
-
-      if (node.children && node.children.length > 0) {
-        // recurse into children
-        return { ...node, children: updateTree(node.children) };
-      }
-
-      return node;
-    });
-  };
-  setTree((prevTree) => updateTree(prevTree));
-    
-  };
+  ): TreeNode[] =>
+    nodes.map((node) =>
+      node.id === updatedNode.id
+        ? { ...node, ...updatedNode }
+        : { ...node, children: updateTreeNode(node.children, updatedNode) },
+    );
 
   // Delete Node
   const deleteFromTree = (nodes: TreeNode[], nodeId: string): TreeNode[] => {
@@ -114,6 +106,11 @@ const TreeView: React.FC<TreeEditorProps> = ({
       }));
     console.log(" finale node ", newNodes);
     return newNodes;
+  };
+
+  const handleEditNode = (node: TreeNode) => {
+    console.log("Editing node: ", node);
+    // setEditingNode(node);
   };
 
   const handleDeleteNode = (nodeId: string) => {
@@ -137,7 +134,13 @@ const TreeView: React.FC<TreeEditorProps> = ({
           paddingLeft: 10,
         }}
       >
-        <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <div>
             <strong>{node.label}</strong> – <em>{node.linkType}</em>
           </div>
@@ -146,7 +149,16 @@ const TreeView: React.FC<TreeEditorProps> = ({
               icon={<Icon source={PlusMinor} />}
               onClick={() => setParentId(node.id)}
             />
-            <Button size="slim" onClick={() => updateTreeNode(node)}>
+            <Button
+              size="slim"
+              onClick={() =>
+                setEditingNode({
+                  ...node,
+                  label: node.label ?? "",
+                  linkType: node.linkType ?? "custom",
+                })
+              }
+            >
               Edit
             </Button>
             <Button
@@ -157,37 +169,59 @@ const TreeView: React.FC<TreeEditorProps> = ({
               Delete
             </Button>
           </div>
+
+          {/*  If user click on  edit  edit modal show up */}
           {editingNode?.id == node?.id && (
-            <div> 
+            <div>
               <div
                 style={{
                   marginTop: 8,
                   padding: 8,
-                  display: "flex",
-                  alignItems: "flex-end",
+                  display: "block",
+                  width: "200px",
+                  // alignItems: "flex-end",
                   gap: 12,
                 }}
               >
-                <TextField
-                  label=" Category Name"
-                  value={editingNode.label}
-                  onChange={(val) =>
-                    setEditingNode({ ...editingNode, label: val })
-                  }
-                  autoComplete="off"
-                />
-                <Select
-                  label="Link "
-                  options={linkTypeOptions}
-                  value={editingNode.linkType}
-                  onChange={(val)=>{
-                    setEditingNode({...editingNode,linkType: val })
-                  }}
-                />
+                <div>
+                  <TextField
+                    label="Category name"
+                    value={editingNode?.label}
+                    onChange={(val) => 
+                        setEditingNode({ ...editingNode, label: val })
+                    }
+                    autoComplete="off"  
+                  />
+                  <Select
+                    label="Link"
+                    options={linkTypeOptions}
+                    value={editingNode.linkType ?? "custom"}
+                    onChange={(val) =>
+                      setEditingNode((prev: any) =>
+                        prev ? { ...prev, linkType: val } : prev,
+                      )
+                    }
+                  />
+                </div>
+                {/* {editingNode.images && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginTop: "10px",
+                      gap: "10px",
+                    }}
+                  >
+                    <p>Show Slider</p>
+                    <Button onClick={() => handleToggle(editingNode, data.id)}>
+                      {active ? "Turn On" : "Turn Off"}
+                    </Button> 
+                  </div>
+                )} */}
                 <Button
                   onClick={() => {
-                    updateNode(editingNode); // pass the full edited node
-                    setEditingNode(null);
+                    setTree((prev) => updateTreeNode(prev, editingNode)); // update the tree recursively
+                    setEditingNode(null); // close editing section
                   }}
                 >
                   Update
@@ -215,6 +249,7 @@ const TreeView: React.FC<TreeEditorProps> = ({
             <Button onClick={handleAddNode}>Add</Button>
           </div>
         )}
+
         {node.children.length > 0 && renderTree(node.children)}
       </div>
     ));
@@ -249,12 +284,13 @@ const TreeView: React.FC<TreeEditorProps> = ({
           borderRadius: 6,
         }}
       >
-        {isCostomize && data ? renderTree(tree) : renderTree(data.items)}
+        {/* {isCostomize && data ? renderTree(tree) : renderTree([])} */}
+        {renderTree(tree)}
       </div>
 
       {/* Edit Modal */}
       {/* {editingNode && (
-        <Modal  
+        <Modal
           open={true}
           onClose={() => setEditingNode(null)}
           title="Edit Category"
@@ -262,7 +298,7 @@ const TreeView: React.FC<TreeEditorProps> = ({
             content: "Save",
             onAction: () => {
               setTree((prev) => updateTreeNode(prev, editingNode));
-              // setEditingNode(null);
+              setEditingNode(null);
             },
           }}
           secondaryActions={[
