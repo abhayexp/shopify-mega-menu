@@ -29,38 +29,27 @@ const handleSubscribe = async (plan :any) => {
           gap: "20px",
         }}
       >
-        <Card title="Basic Plan" sectioned>
-          <p style={{ fontWeight: "600", fontSize: "16px" }}>$5 / month</p>
+        <Card title="Free Plan" sectioned>
+          <p style={{ fontWeight: "600", fontSize: "16px" }}>Free</p>
           <ul>
-            <li>Basic feature 1</li>
-            <li>Basic feature 2</li>
+            <li>Multi-level Navigation</li>
+            <li>Menu Types</li>
+            <li>Responsive Design</li>
+            <li> Image & Banner Support</li>
+            <li>Dynamic Content</li>
           </ul>
-          <Button primary onClick={() => handleSubscribe("free")}>
-            Activate
-          </Button>
         </Card>
 
         <Card title="Pro Plan" sectioned>
           <p style={{ fontWeight: "600", fontSize: "16px" }}>$19 / month</p>
           <ul>
-            <li>Advanced feature 1</li>
-            <li>Advanced feature 2</li>
+            <li> Free plan + More than 3 menus</li>
           </ul>
           <Button primary onClick={() => handleSubscribe("pro")}>
             Subscribe
           </Button>
         </Card>
- 
-        <Card title="Enterprise Plan" sectioned>
-          <p style={{ fontWeight: "600", fontSize: "16px" }}>$49 / month</p>
-          <ul>
-            <li>All features included</li>
-            <li>Priority support</li>
-          </ul>
-          <Button primary onClick={() => handleSubscribe("enterprise")}>
-            Subscribe
-          </Button>
-        </Card>
+
       </div>
     </Page>
   );
