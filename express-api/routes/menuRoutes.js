@@ -4,7 +4,8 @@ import { AddMenu, deleteMenu, getAllMenu, getCollection,
    getMenuById  , publishMenu, getPublishMenu, addSliderImage,
    getSliderImage,
    hideSlider,
-    subscription
+   subscription,
+   getsubscriptionDetails
   } from '../controller/MenuController.js';
 import multer from 'multer';
 
@@ -55,7 +56,10 @@ router.get('/menu/active',getPublishMenu);
 
 router.post('/add-slider-images', addSliderImage);
 router.post('/hideslider', hideSlider);
-router.get('/issubscribed', subscription);
+
+//subscription
+router.post('/appsubscription', subscription);
+router.get('/appsubscription/:shop', getsubscriptionDetails);
 
 router.get('/file/:filename', getSliderImage);
 

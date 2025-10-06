@@ -39,18 +39,52 @@ const TreeView: React.FC<TreeEditorProps> = ({
     defaultLinkTypeOptions,
   );
 
+  const [menuId, setMenuId] = useState<string>("");
+  const [itemId, setItemId] = useState<string>("");
+    const [imgactive, setImgActive] = useState(false);
+
 
   useEffect(() => {
     if (isCostomize && data?.items) {
       setTree(data.items);
-    }
-    else {
+    } else {
       setTree([]);
     }
   }, [isCostomize, data]);
 
 
   
+
+  //  image toggle handler
+  const handleToggle = async (node: any, menuId: string) => {
+    setMenuId(menuId);
+    setItemId(editingNode.id);
+    try {
+      console.log("Item Id:", editingNode.id);
+      console.log("Menu Id:", menuId);
+      console.log("Visibility  :", imgactive);
+      const itemId = editingNode.id;
+      const response = await fetch(`http://localhost:5000/api/hideslider`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ menuId, itemId, isSliderVisible: imgactive }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Response Status : ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Slider hide/show response", result);
+      setEditingNode(null); // close editing section
+    } catch (error) {
+      console.log(error);
+    }
+    setImgActive((prev) => !prev);
+  };
+
   // Add Node
   const handleAddNode = () => {
     if (!label.trim()) return;
@@ -106,11 +140,6 @@ const TreeView: React.FC<TreeEditorProps> = ({
       }));
     console.log(" finale node ", newNodes);
     return newNodes;
-  };
-
-  const handleEditNode = (node: TreeNode) => {
-    console.log("Editing node: ", node);
-    // setEditingNode(node);
   };
 
   const handleDeleteNode = (nodeId: string) => {
@@ -203,10 +232,12 @@ const TreeView: React.FC<TreeEditorProps> = ({
                     }
                   />
                 </div>
-                {/* {editingNode.images && (
+                {/*  Add PRO PLAN condition */}
+ 
+                {editingNode.images.length > 0 && (
                   <div
                     style={{
-                      display: "flex",
+                      display: "flex",  
                       alignItems: "center",
                       marginTop: "10px",
                       gap: "10px",
@@ -214,14 +245,14 @@ const TreeView: React.FC<TreeEditorProps> = ({
                   >
                     <p>Show Slider</p>
                     <Button onClick={() => handleToggle(editingNode, data.id)}>
-                      {active ? "Turn On" : "Turn Off"}
-                    </Button> 
+                      {imgactive ? "Turn On" : "Turn Off"}
+                    </Button>
                   </div>
-                )} */}
+                )}
                 <Button
                   onClick={() => {
-                    setTree((prev) => updateTreeNode(prev, editingNode)); // update the tree recursively
-                    setEditingNode(null); // close editing section
+                    setTree((prev) => updateTreeNode(prev, editingNode)); // update the tree 
+                    setEditingNode(null); // close editing 
                   }}
                 >
                   Update
@@ -272,6 +303,9 @@ const TreeView: React.FC<TreeEditorProps> = ({
     };
     getCollections();
   }, []);
+
+
+  console.log(" Editing  data ", editingNode);
 
   return (
     <div style={{ marginTop: 20 }}>
