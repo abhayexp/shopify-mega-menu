@@ -5,6 +5,8 @@ import sliderSchema from "../models/sliderSchema.js";
 import PublishMenu from "../models/publish.js";
 import CategorySlider from "../models/sliderSchema.js";
 import MenuSliders from "../models/sliderSchema.js";
+import Subscription from "../models/subscription.js";
+
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import Menu from "../models/megamenu.js";
@@ -19,7 +21,7 @@ let gfs;
 
 mongoose.connection.once("open", () => {
   gfs = new GridFSBucket(mongoose.connection.db, {
-    bucketName: "uploads", // same bucket you used for upload
+    bucketName: "uploads",
   });
 });
 
@@ -65,7 +67,6 @@ export const getAllMenu = async (req, res) => {
     if (!menus || menus.length === 0) {
       return res.status(404).json({ message: "No menus found" });
     }
-
     res.status(200).json({
       message: "Menus fetched successfully",
       count: menus.length,
@@ -436,56 +437,37 @@ export const hideSlider = async (req, res) => {
 };
 
 export const subscription = async (req, res) => {
+
   try {
-    const shop = process.env.SHOP_URL;
-    const version = process.env.API_VERSION;
-    const TOKEN = process.env.ADMIN_TOKEN;
 
-    // if (!subscriptionId) {
-    //   return res.status(400).json({ message: "Subscription ID is required" });
-    // }
-    // Process the subscription ID as needed
-    // console.log("Received Subscription ID:", subscriptionId.id);
-    const query = `
-    query  {
-      currentAppInstallation {
-    activeSubscriptions {
-      id
-      name
-      status
-      test
-      currentPeriodEnd
-    }
-  }
-    }
-  `;
+    const { shopifyDomain, subscriptionId, plan, status, interval } = req.body;
 
-    const response = await fetch(
-      `https://${shop}/admin/api/${version}/graphql.json`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Shopify-Access-Token": TOKEN,
-        },
-        body: JSON.stringify({ query }),
+    if (!shopifyDomain || !subscriptionId || !plan || !status || !interval) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    const subscriptionExist = await Subscription.findOne({ shop: shopifyDomain });
+    const now = new Date();
+
+    if (subscriptionExist) {
+      if ( subscriptionExist.validUntil> now && subscriptionExist.status === "active") {
+        return res.status(400).json({ message: "Active subscription already exists for this shop" });
       }
-    );
-
-    console.log("GraphQL Response:", response);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("GraphQL Error:", errorData);
-      return res.status(400).json({ message: "Failed to retrieve subscription data", error: errorData });
+      // add more condition or add new subscription
     }
-    const result = await response.json();
-    // console.log("GraphQL Result:", result);
 
-    return res
-      .status(200)
-      .json({ message: "Subscription ID received", result });
+    if (!process.env.ADMIN_TOKEN) {
+      throw new Error("Missing Shopify Admin API token");
+    }
 
+    await Subscription.create({
+      shop: shopifyDomain,
+      subscriptionId,
+      plan,
+      status,
+      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      interval,
+    })
+    res.json({ success: true, message: "Subscription updated" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -494,3 +476,28 @@ export const subscription = async (req, res) => {
     });
   }
 };
+
+export const getsubscriptionDetails = async (req, res) => {
+  try {
+    const { shop } = req.params;
+    
+    if (!shop) {
+      return res.status(400).json({ message: "Shop parameter is required" });
+    }
+    const subscription = await Subscription.findOne({ shop });
+
+    if (!subscription) {
+      return res.status(404).json({ message: "No subscription found for this shop" });
+    }
+
+    return res.status(200).json({ message: "Subscription fetched successfully", subscription });
+  }
+  catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
