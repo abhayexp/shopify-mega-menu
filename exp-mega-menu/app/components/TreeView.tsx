@@ -41,8 +41,7 @@ const TreeView: React.FC<TreeEditorProps> = ({
 
   const [menuId, setMenuId] = useState<string>("");
   const [itemId, setItemId] = useState<string>("");
-    const [imgactive, setImgActive] = useState(false);
-
+  const [imgactive, setImgActive] = useState(false);
 
   useEffect(() => {
     if (isCostomize && data?.items) {
@@ -51,9 +50,6 @@ const TreeView: React.FC<TreeEditorProps> = ({
       setTree([]);
     }
   }, [isCostomize, data]);
-
-
-  
 
   //  image toggle handler
   const handleToggle = async (node: any, menuId: string) => {
@@ -97,10 +93,10 @@ const TreeView: React.FC<TreeEditorProps> = ({
 
     const addNode = (nodes: TreeNode[], parentId?: string): TreeNode[] => {
       if (!parentId) return [...nodes, newNode];
-      return nodes.map(node =>
+      return nodes.map((node) =>
         node.id === parentId
           ? { ...node, children: [...node.children, newNode] }
-          : { ...node, children: addNode(node.children, parentId) }
+          : { ...node, children: addNode(node.children, parentId) },
       );
     };
 
@@ -109,7 +105,7 @@ const TreeView: React.FC<TreeEditorProps> = ({
       setTree(updatedItems);
       data.items = updatedItems;
     } else {
-      setTree(prev => addNode(prev, parentId || undefined));
+      setTree((prev) => addNode(prev, parentId || undefined));
     }
 
     setLabel("");
@@ -149,6 +145,16 @@ const TreeView: React.FC<TreeEditorProps> = ({
     });
 
     if (editingNode?.id === nodeId) setEditingNode(null);
+  };
+
+  const handleDeleteImage = (node: any, imageId: string) => {
+    console.log(" editing node  id ", node);
+    console.log(" image id ", imageId);
+    const updatedImages = node.images.filter((img: any) => img._id !== imageId);
+    const updatedNode = { ...node, images: updatedImages };
+    console.log("Updated node after delete:", updatedNode);
+    setTree((prevTree: any) => updateTreeNode(prevTree, updatedNode));
+    if (editingNode?.id === node.id) setEditingNode(updatedNode);
   };
 
   // Render Tree recursively
@@ -216,10 +222,10 @@ const TreeView: React.FC<TreeEditorProps> = ({
                   <TextField
                     label="Category name"
                     value={editingNode?.label}
-                    onChange={(val) => 
-                        setEditingNode({ ...editingNode, label: val })
+                    onChange={(val) =>
+                      setEditingNode({ ...editingNode, label: val })
                     }
-                    autoComplete="off"  
+                    autoComplete="off"
                   />
                   <Select
                     label="Link"
@@ -233,30 +239,61 @@ const TreeView: React.FC<TreeEditorProps> = ({
                   />
                 </div>
                 {/*  Add PRO PLAN condition */}
- 
+
                 {editingNode.images.length > 0 && (
-                  <div
-                    style={{
-                      display: "flex",  
-                      alignItems: "center",
-                      marginTop: "10px",
-                      gap: "10px",
-                    }}
-                  >
-                    <p>Show Slider</p>
-                    <Button onClick={() => handleToggle(editingNode, data.id)}>
-                      {imgactive ? "Turn On" : "Turn Off"}
-                    </Button>
+                  <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginTop: "10px",
+                        gap: "10px",
+                      }}
+                    >
+                      <p>Show Slider</p>
+                      <Button
+                        onClick={() => handleToggle(editingNode, data.id)}
+                      >
+                        {imgactive ? "Turn On" : "Turn Off"}
+                      </Button>
+                    </div>
+
+                    <div>
+                      {editingNode.images.map((img, index) => (
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "10px",
+                            alignItems: "center",
+                            marginTop: "10px",
+                          }}
+                        >
+                          <p>{img.title}</p>
+                          <Button
+                            onClick={() =>
+                              handleDeleteImage(editingNode, img._id)
+                            }
+                            icon={<Trash2 size={14} color="#c62828" />}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
-                <Button
-                  onClick={() => {
-                    setTree((prev) => updateTreeNode(prev, editingNode)); // update the tree 
-                    setEditingNode(null); // close editing 
-                  }}
-                >
-                  Update
-                </Button>
+
+                <div style={{ marginTop: "10px" }}>
+                  <Button
+                    onClick={() => {
+                      setTree((prev) => updateTreeNode(prev, editingNode)); // update the tree
+                      setEditingNode(null); // close editing
+                    }}
+                  >
+                    Update
+                  </Button>
+                  <Button onClick={() => setEditingNode(null)} tone="critical">
+                    Cancel
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -303,7 +340,6 @@ const TreeView: React.FC<TreeEditorProps> = ({
     };
     getCollections();
   }, []);
-
 
   console.log(" Editing  data ", editingNode);
 

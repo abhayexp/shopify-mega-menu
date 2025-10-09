@@ -551,6 +551,7 @@ document.querySelectorAll('has-children').forEach(link=>{
     const link = document.createElement('a');
     link.textContent = node.label;
     link.href = `/collections/${node.linkType}`; 
+link.classList.add('child-menu-title');
     colDiv.appendChild(link);
 
     // Render links if present (Array of strings)

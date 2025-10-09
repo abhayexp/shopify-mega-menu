@@ -114,7 +114,7 @@ export default function MenuGrid({ onCustomise }: any) {
         .then(response => response.json())
         .then(data => {
           console.log("Menu published:", data);
-
+          shopify.toast.show('Menu  Published Successfully');
           fetchMenus();
         })
         .catch(error => {
@@ -137,15 +137,18 @@ export default function MenuGrid({ onCustomise }: any) {
       const data = await response.json();
       console.log(" data", data);
       if (!response.ok) {
+        shopify.toast.show('Delete Failed');
         console.log(" Delete Failed", id);
         return;
       }
       if (response.ok) {
+        shopify.toast.show('Menu Deleted Successfully');
         console.log("Menu deleted:", data.message);
         fetchMenus();
       }
     }
     catch (error) {
+
       console.log(error);
 
     }
