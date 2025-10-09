@@ -107,8 +107,11 @@
             title: '',
             items: []
           });
+          shopify.toast.show('Menu Created Successfully');
           setTimeout(() => {
+
             setActive(prev => !prev);
+
           }, 3000);
         })
         .catch((error) => {
